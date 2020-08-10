@@ -1,5 +1,4 @@
 const multer = require("multer");
-const { cloudStorage, fileFilter } = require("../../../helpers/multerConfig");
 const express = require("express");
 const router = express.Router();
 const { verify } = require("../../../middleware/auth");

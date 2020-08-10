@@ -14,6 +14,7 @@
   "dependencies": {
     "@google-cloud/storage": "^5.0.1",
     "acorn": "^7.1.1",
+    "aws-sdk": "^2.730.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",

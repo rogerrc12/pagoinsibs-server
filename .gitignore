@@ -1,3 +1,7 @@
+# keys
+pi_private.key
+pi_public.key
+
 # Logs
 logs
 *.log
