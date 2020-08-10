@@ -57,12 +57,12 @@ app.use((error, req, res, next) => {
 
   try {
     // DATABASE RELATIONS
-    await relateTables();
-    await db.sync();
-    await db.authenticate();
-    await createSequencesTables();
+    // await relateTables();
+    // await db.sync();
+    // await db.authenticate();
+    // await createSequencesTables();
 
-    console.log("connected to database...");
+    // console.log("connected to database...");
 
     app.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
   } catch (error) {
