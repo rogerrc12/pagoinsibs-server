@@ -13,11 +13,6 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-// Client routes
-app.get("/", (req, res) => {
-  return res.status(200).send("bienvenido al servidor");
-});
-
 app.use("/api/users", require("./routes/api/client/users"));
 app.use("/api/auth", require("./routes/api/client/auth"));
 app.use("/api/banks", require("./routes/api/client/banks"));

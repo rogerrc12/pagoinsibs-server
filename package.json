@@ -37,6 +37,7 @@
     "pug": "^2.0.4",
     "read-excel-file": "^4.0.6",
     "sequelize": "^5.21.7",
+    "sequelize-cli": "^6.2.0",
     "translate": "^1.1.2",
     "uuid": "^7.0.3",
     "winston": "^3.2.1"
