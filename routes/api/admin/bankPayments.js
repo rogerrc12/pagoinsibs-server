@@ -1,3 +1,4 @@
+const { storage, fileFilter } = require("../../../helpers/multerConfig");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
@@ -42,10 +43,7 @@ router.get("/create-ciser", verify, bankPaymentsController.generateCiserFile);
 // @access Private
 router.post(
   "/process-ciser",
-  [
-    verify,
-    // multer({ storage: cloudStorage, fileFilter }).single('file')
-  ],
+  [verify, multer({ storage, fileFilter }).single("file")],
   bankPaymentsController.processCiserFile
 );
 

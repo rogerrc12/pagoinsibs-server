@@ -1,4 +1,5 @@
 const db = require("../../config/db");
+const fs = require("fs");
 const { Op } = require("sequelize");
 const BankPayment = require("../../models/admin/bankPayment");
 const Correlative = require("../../models/admin/correlative");
@@ -10,6 +11,11 @@ const AccPayment = require("../../models/accPayment");
 const readExcel = require("read-excel-file/node");
 const { addDays, addMonths } = require("../../helpers/functions");
 const { generateSiserFile } = require("../../helpers/excelFiles");
+const AWS = require("aws-sdk");
+const S3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
 
 const getBankPayments = async (req, res, next) => {
   const { bank_id } = req.query;
@@ -104,52 +110,51 @@ const processCiserFile = async (req, res, next) => {
       throw error;
     }
 
-    const { filename } = req.file;
-
-    const fileStream = "testing";
+    const { filename, path } = req.file;
 
     // CONVERT EXCEL FILE INTO AN ARRAY OF OBJECTS
-    const file = await readExcel(fileStream);
+    const file = await readExcel(fs.createReadStream(path));
+    console.log(file);
 
-    const fileArray = [...file];
-    const fileKeys = [...file[0]];
-    fileArray.shift();
+    // const fileArray = [...file];
+    // const fileKeys = [...file[0]];
+    // fileArray.shift();
 
-    let fileData = [];
+    // let fileData = [];
 
-    fileArray.map((item) => {
-      const object = item.reduce((result, field, i) => {
-        let key = fileKeys[i]
-          .normalize("NFKD")
-          .replace(/[\u0300-\u036F]/g, "")
-          .replace(/\s+/g, "");
-        result[key] = field;
-        return result;
-      }, {});
-      fileData.push(object);
-    });
+    // fileArray.map((item) => {
+    //   const object = item.reduce((result, field, i) => {
+    //     let key = fileKeys[i]
+    //       .normalize("NFKD")
+    //       .replace(/[\u0300-\u036F]/g, "")
+    //       .replace(/\s+/g, "");
+    //     result[key] = field;
+    //     return result;
+    //   }, {});
+    //   fileData.push(object);
+    // });
 
-    // UPDATE PAYMENTS AND DEBITS STATUS FROM FILE DATA
-    const payments = await updatePaymentStatusFromSiser(fileData);
-    const debits = await updateDebitStatusFromSiser(fileData);
+    // // UPDATE PAYMENTS AND DEBITS STATUS FROM FILE DATA
+    // const payments = await updatePaymentStatusFromSiser(fileData);
+    // const debits = await updateDebitStatusFromSiser(fileData);
 
-    if (!payments && !debits) {
-      const error = new Error(
-        "No hay ningun pago para ser procesado en este lote. Revisa el archivo o intenta con" + " otro."
-      );
-      error.statusCode = 404;
-      throw error;
-    }
+    // if (!payments && !debits) {
+    //   const error = new Error(
+    //     "No hay ningun pago para ser procesado en este lote. Revisa el archivo o intenta con" + " otro."
+    //   );
+    //   error.statusCode = 404;
+    //   throw error;
+    // }
 
-    if (payments) {
-      await deleteProcessedPayments(payments);
-    }
+    // if (payments) {
+    //   await deleteProcessedPayments(payments);
+    // }
 
-    if (debits) {
-      await deleteProcessedPayments(debits);
-    }
+    // if (debits) {
+    //   await deleteProcessedPayments(debits);
+    // }
 
-    await deleteFileGcStorage(filename);
+    // await deleteFileGcStorage(filename);
     return res.status(200).json({ message: "Todos los pagos fueron procesados y actualizados." });
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
