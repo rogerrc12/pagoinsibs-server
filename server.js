@@ -10,7 +10,11 @@ app.set("trust proxy", true);
 
 // Apply json middleware
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    exposedHeaders: ["X-Suggested-Filename", "Content-Disposition"],
+  })
+);
 app.use(helmet());
 
 app.use("/api/users", require("./routes/api/client/users"));

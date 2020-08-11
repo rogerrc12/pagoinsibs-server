@@ -73,10 +73,10 @@ const generateCiserFile = async (req, res, next) => {
     const fileName = `ciser_#${correlative}.xlsx`;
 
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("X-Suggested-Filename", fileName);
     res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-    console.log(res);
-    await workbook.xlsx.write(res);
 
+    await workbook.xlsx.write(res);
     await updateSiserCorrelative(correlative);
 
     return res.status(200).end();
