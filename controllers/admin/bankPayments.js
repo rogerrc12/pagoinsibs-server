@@ -110,11 +110,11 @@ const processCiserFile = async (req, res, next) => {
       throw error;
     }
 
-    const { filename, path } = req.file;
+    const { path } = req.file;
+    console.log(req.file);
 
     // CONVERT EXCEL FILE INTO AN ARRAY OF OBJECTS
     const file = await readExcel(fs.createReadStream(path));
-    console.log(file);
 
     // const fileArray = [...file];
     // const fileKeys = [...file[0]];

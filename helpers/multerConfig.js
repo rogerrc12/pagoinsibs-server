@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, "..", "uploads"));
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    cb(null, file.originalname.split(".")[0] + "_" + new Date().toISOString() + ".xlsx");
   },
 });
 
