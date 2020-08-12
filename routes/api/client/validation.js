@@ -1,24 +1,21 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const User = require('../../../models/user');
+const User = require("../../../models/user");
 
-router.post('/cedula', async (req, res, next) => {
-
+router.post("/cedula", async (req, res, next) => {
   const { cedula } = req.body;
 
   try {
-    const user = await User.findOne({ where: { cedula } });
-    
+    const user = await User.findOne({ where: { cedula: "V" + cedula } });
+
     res.json(user ? true : user);
   } catch (error) {
     res.statusCode = 500;
     next(error);
   }
-  
 });
 
-router.post('/username', async (req, res) => {
-
+router.post("/username", async (req, res) => {
   const { pay_id } = req.body;
 
   try {
@@ -28,10 +25,9 @@ router.post('/username', async (req, res) => {
   } catch (error) {
     res.status(500).send(true);
   }
-  
 });
 
-router.post('/email', async (req, res) => {
+router.post("/email", async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -42,7 +38,6 @@ router.post('/email', async (req, res) => {
     console.error(error.message);
     res.status(500).send(false);
   }
-  
 });
 
 module.exports = router;
