@@ -106,6 +106,7 @@ const processCiserFile = async (req, res, next) => {
     }
 
     const { path } = req.file;
+    console.log(path);
 
     // CONVERT EXCEL FILE INTO AN ARRAY OF OBJECTS
     const file = await readExcel(fs.createReadStream(path));
