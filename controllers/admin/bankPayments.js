@@ -11,11 +11,6 @@ const AccPayment = require("../../models/accPayment");
 const readExcel = require("read-excel-file/node");
 const { addDays, addMonths } = require("../../helpers/functions");
 const { generateSiserFile } = require("../../helpers/excelFiles");
-const AWS = require("aws-sdk");
-const S3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-});
 
 const getBankPayments = async (req, res, next) => {
   const { bank_id } = req.query;
@@ -175,6 +170,7 @@ const updatePaymentStatusFromSiser = async (data) => {
         await AccPayment.update({ statusId: 3, endPaymentDate: data[i].FechaPago }, { where: { id: paymentId } });
       } else {
         const newAttempts = payment.attempts - 1;
+
         await AccPayment.update(
           {
             statusId: newAttempts === 0 ? 5 : 4,
@@ -201,7 +197,6 @@ const updateDebitStatusFromSiser = async (data) => {
       const { feeId } = debitPayments[i];
 
       let fee = await FeeControl.findByPk(feeId, { include: Debit });
-
       if (data[i].Estado.toLowerCase() === "pagado") {
         await db.transaction(async (trx) => {
           fee.statusId = 3;
@@ -226,7 +221,7 @@ const updateDebitStatusFromSiser = async (data) => {
 
             await Debit.update(
               { statusId: 1, startPaymentDate: paymentDate, attempts: 0 },
-              { where: { id: debit.id }, transaction: trx }
+              { where: { id: fee.debit.id }, transaction: trx }
             );
           } else {
             const feePaymentDate = await FeeControl.findOne({
@@ -247,8 +242,7 @@ const updateDebitStatusFromSiser = async (data) => {
           }
         }); // END OF TRANSACION
       } else {
-        const newAttempts = Number(fee.debit.attempts) - 1;
-
+        const newAttempts = fee.debit.attempts - 1;
         await db.transaction(async (trx) => {
           await Debit.update(
             {
@@ -272,10 +266,6 @@ const updateDebitStatusFromSiser = async (data) => {
             await FeeControl.update({ statusId: 4 }, { where: { id: fee.id } });
           }
         });
-
-        // if (newAttempts === 0) {
-        //   console.log('Ya no hay más intentos para este pago. se dará como  y se enviará correo.');
-        // }
       }
     }
 
