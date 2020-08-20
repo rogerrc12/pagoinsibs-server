@@ -26,6 +26,49 @@ const createReport = async (req, res, next) => {
 
     let workbook, bank, fileName, fees, payments;
     switch (report_type) {
+      case "pending":
+        fees = await FeeControl.findAll({
+          where: {
+            statusId: 1,
+            paymentDate: { [Op.between]: [fromDate, toDate] },
+          },
+          include: [
+            {
+              model: Debit,
+              include: [
+                { model: User, attributes: ["firstName", "lastName", "cedula"] },
+                { model: Supplier, attributes: ["name", "rif"] },
+              ],
+            },
+          ],
+          order: [["paymentDate", "DESC"]],
+        });
+
+        payments = await Payment.findAll({
+          where: {
+            statusId: 1,
+            startPaymentDate: {
+              [Op.between]: [startDate, endDate],
+            },
+          },
+          include: [
+            { model: User, attributes: ["firstName", "lastName", "cedula"] },
+            { model: Supplier, attributes: ["name", "rif"] },
+          ],
+          order: [["startPaymentDate", "DESC"]],
+        });
+
+        if (fees.length === 0 && payments.length === 0) {
+          const error = new Error("No se encontraron entradas en este rango de fecha.");
+          error.statusCode = 404;
+          throw error;
+        }
+
+        workbook = reports.createPendingReport(fees, payments);
+        fileName = `Cuotas pendientes por cobrar general desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(
+          endDate
+        ).format("DD-MM-YYYY")}.xlsx`;
+        break;
       case "pending-bank":
         bank = await Bank.findByPk(bankId);
 
