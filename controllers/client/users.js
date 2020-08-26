@@ -1,4 +1,4 @@
-const User = require('../../models/user');
+const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
 const { v4 } = require("uuid");
 const nanoid = require("nanoid/async/generate");
@@ -16,21 +16,23 @@ const updateProfile = async (req, res, next) => {
       error.statusCode = 422;
       throw error;
     }
-    
+
     const userInfo = await User.findByPk(req.user.id);
-    
-    await User
-      .update({
+
+    await User.update(
+      {
         address: address ? address : userInfo.address,
         city: city ? city : userInfo.city,
         phone: phone ? phone : userInfo.phone,
         birthday: birthday ? new Date(birthday) : userInfo.birthday,
         gender: gender ? gender : userInfo.gender,
-        profileCompleted: true
-      }, {where: {id: req.user.id}});
-  
+        profileCompleted: true,
+      },
+      { where: { id: req.user.id } }
+    );
+
     const updatedUser = await User.findByPk(req.user.id);
-  
+
     return res.json(updatedUser);
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
@@ -66,7 +68,7 @@ const registerUser = async (req, res, next) => {
       username: username.toLowerCase(),
       hash,
       clientId: "IN" + client_id,
-      roleId: 4
+      roleId: 4,
     };
 
     // Insert user in DB
@@ -102,7 +104,6 @@ const registerUser = async (req, res, next) => {
 };
 
 const getUserData = async (req, res, next) => {
-
   try {
     const user = await User.findByPk(req.user.id);
 
@@ -124,7 +125,7 @@ const sendPasswordResetToken = async (req, res, next) => {
 
     const { email } = req.body;
 
-    const user = await User.findOne({ where: {email} });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       const error = new Error("No se ha encontrado una cuenta asociada a este correo.");
@@ -153,7 +154,7 @@ const sendPasswordResetToken = async (req, res, next) => {
       template: "password_reset",
       variables: JSON.stringify({
         name: user.firstName,
-        resetLink: `https://pagoinsibs.com/password-reset?reset=true&reset_token=${user.resetToken}` 
+        resetLink: `https://pagoinsibs.com/password-reset?reset=true&reset_token=${user.resetToken}`,
       }),
     };
 
@@ -170,14 +171,13 @@ const getPasswordReset = async (req, res, next) => {
   const { reset, reset_token } = req.query;
 
   try {
-
     if (!reset) {
       const error = new Error("Esta acción no está permitida.");
       error.statusCode = 409;
       throw error;
     }
 
-    const user = await User.findOne({ where: {resetToken: reset_token} })
+    const user = await User.findOne({ where: { resetToken: reset_token } });
 
     if (!user) {
       const error = new Error("No se encuentra el usuario o el link ha expirado.");
@@ -212,9 +212,9 @@ const resetPassword = async (req, res, next) => {
     const { email, password } = req.body;
     const hash = await bcrypt.hash(password, 12);
 
-    await User.update({ hash }, { where: {email} });
+    await User.update({ hash }, { where: { email } });
 
-    res.status(200).json({ message: 'La contraseña fue cambiada de forma exitosa.' });
+    res.status(200).json({ message: "La contraseña fue cambiada de forma exitosa." });
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);
@@ -227,5 +227,5 @@ module.exports = {
   registerUser,
   sendPasswordResetToken,
   getPasswordReset,
-  resetPassword
+  resetPassword,
 };
