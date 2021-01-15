@@ -43,7 +43,7 @@ const editCurrency = async (req, res, next) => {
     currency.buyPrice = buyPrice;
     currency.sellPrice = sellPrice;
     await currency.save();
-    return res.status(200).send("Moneda guardada correctamente.");
+    return res.status(200).send("La moneda fue guardada correctamente.");
   } catch (error) {
     error.statusCode = 500;
     next(error);
