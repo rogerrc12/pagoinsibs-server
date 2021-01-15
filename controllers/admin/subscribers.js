@@ -1,8 +1,8 @@
-const User = require('../../models/user')
-const Account = require('../../models/account')
-const AccPayment = require('../../models/accPayment');
-const Bank = require('../../models/admin/bank');
-const Status = require('../../models/status');
+const User = require("../../models/user");
+const Account = require("../../models/account");
+const AccPayment = require("../../models/payment");
+const Bank = require("../../models/admin/bank");
+const Status = require("../../models/status");
 
 const getSubscribers = async (req, res, next) => {
   try {
@@ -12,27 +12,34 @@ const getSubscribers = async (req, res, next) => {
     error.statusCode = 500;
     next(error);
   }
-} 
+};
 
-const getProfile = async (req, res ,next) => {
+const getProfile = async (req, res, next) => {
   const { id } = req.params;
-  
+
   try {
-    const user = await User.findByPk(id, { include: [{model: Account, include: Bank}, {model: AccPayment, include: Status}] });
+    const user = await User.findByPk(id, {
+      include: [
+        { model: Account, include: Bank },
+        { model: AccPayment, include: Status },
+      ],
+    });
     const profile = {
-      information: user, accounts: user.accounts, payments: user.accPayments
-    }
-    
+      information: user,
+      accounts: user.accounts,
+      payments: user.accPayments,
+    };
+
     return res.status(200).json(profile);
   } catch (error) {
     error.statusCode = 500;
     next(error);
   }
-}
+};
 
 module.exports = {
   getSubscribers,
-  getProfile
+  getProfile,
   //
   // getProfileCcPayments: async id => {
   //   return await db('users_tdc_payments as uccp')
@@ -71,4 +78,4 @@ module.exports = {
   //     .join('banks as b', { 'ar.bank_id':'b.bank_id' })
   //     .where({ user_id: id })
   // }
-}
+};

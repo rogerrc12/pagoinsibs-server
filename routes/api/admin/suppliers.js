@@ -8,8 +8,8 @@ const suppliersController = require("../../../controllers/admin/suppliers");
 
 // @route  GET admin/suppliers
 // @desc   Get all suppliers
-// @access Private
-router.get("/", verify, suppliersController.getSuppliers);
+// @access Public
+router.get("/", suppliersController.getSuppliers);
 
 // @route  GET admin/suppliers/profile/:id
 // @desc   Get supplier profile
@@ -46,6 +46,11 @@ router.post(
 // @desc   Edit a supplier
 // @access Private
 router.put("/:id", verify, suppliersController.editSupplier);
+
+// @route  GET admin/suppliers/bank-account/:supplierId
+// @desc   Get account data from supplier id
+// @access Private
+router.get("/bank-account/:accountId", verify, suppliersController.getSupplierAccount);
 
 // @route  POST admin/suppliers/bank-account/:id
 // @desc   Add a new bank account for supplier

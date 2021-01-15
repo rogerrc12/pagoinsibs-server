@@ -19,7 +19,7 @@ app.use(helmet());
 
 app.use("/api/users", require("./routes/api/client/users"));
 app.use("/api/auth", require("./routes/api/client/auth"));
-app.use("/api/banks", require("./routes/api/client/banks"));
+app.use("/api/banks", require("./routes/api/banks"));
 app.use("/api/validation", require("./routes/api/client/validation"));
 app.use("/api/payments", require("./routes/api/client/payments"));
 app.use("/api/debits", require("./routes/api/client/debits"));
@@ -27,6 +27,7 @@ app.use("/api/transfers", require("./routes/api/client/transfers"));
 app.use("/api/detail", require("./routes/api/client/details"));
 app.use("/api/accounts", require("./routes/api/client/accounts"));
 app.use("/api/suppliers", require("./routes/api/client/suppliers"));
+app.use("/api/currencies", require("./routes/api/currencies"));
 
 // Admin routes
 app.use("/api/admin/users", require("./routes/api/admin/users"));
@@ -48,7 +49,7 @@ app.use((error, req, res, next) => {
       ? error.message
       : "Ha ocurrido un error inserperado. verifica tu conexión a internet e intenta de nuevo. Si el problema persiste, por favor contacta a soporte.";
 
-  return res.status(status).json({ message });
+  return res.status(status).send({ message });
 });
 
 (async function () {

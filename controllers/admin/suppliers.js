@@ -4,8 +4,8 @@ const Bank = require("../../models/admin/bank");
 const Debit = require("../../models/debit");
 const Status = require("../../models/status");
 const User = require("../../models/user");
-const AccPayment = require("../../models/accPayment");
-const CcPayment = require("../../models/ccPayment");
+const AccPayment = require("../../models/payment");
+const CcPayment = require("../../models/payment");
 const { validationResult } = require("express-validator/check");
 
 const getSuppliers = async (req, res, next) => {
@@ -74,20 +74,13 @@ const getProfile = async (req, res, next) => {
   }
 };
 
+const getSupplierAccount = async (req, res, next) => {
+  const { accountId } = req.params;
+  console.log(accountId);
+};
+
 const postSupplier = async (req, res, next) => {
-  const {
-    supplier_type,
-    name,
-    rif,
-    address,
-    city,
-    state,
-    manager_fname,
-    manager_lname,
-    local_phone,
-    mobile_phone,
-    email,
-  } = req.body;
+  const { supplier_type, name, rif, address, city, state, manager_fname, manager_lname, local_phone, mobile_phone, email } = req.body;
 
   try {
     const errors = validationResult(req);
@@ -128,19 +121,7 @@ const postSupplier = async (req, res, next) => {
 };
 
 const editSupplier = async (req, res, next) => {
-  const {
-    supplier_type,
-    name,
-    rif,
-    address,
-    city,
-    state,
-    manager_fname,
-    manager_lname,
-    local_phone,
-    mobile_phone,
-    email,
-  } = req.body;
+  const { supplier_type, name, rif, address, city, state, manager_fname, manager_lname, local_phone, mobile_phone, email } = req.body;
   const { id } = req.params;
 
   try {
@@ -220,6 +201,7 @@ const deactivateSupplier = async (req, res, next) => {
 module.exports = {
   getSuppliers,
   getProfile,
+  getSupplierAccount,
   postSupplier,
   editSupplier,
   createSupplierAccount,

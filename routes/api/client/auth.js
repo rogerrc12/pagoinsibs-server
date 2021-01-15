@@ -4,7 +4,7 @@ const { verify } = require("../../../middleware/auth");
 const { check } = require("express-validator/check");
 // controllers
 const usersController = require("../../../controllers/client/users");
-const authController = require('../../../controllers/client/auth');
+const authController = require("../../../controllers/client/auth");
 
 // @route  GET api/auth
 // @desc   Get user data
@@ -18,18 +18,11 @@ router.post(
   "/",
   [
     [
-      check(
-        "email",
-        "El correo ingresado es inválido, verifica los datos."
-      ).isEmail(),
-
-      check(
-        "password",
-        "La contraseña ingresada es inválida, verifica los datos."
-      ).matches(/^(?=.*\d)(?=.*[a-zA-Z])[A-Za-z\d!@#$%^&*()_\-+=]{6,}$/)
-    ]
+      check("email", "El correo ingresado es inválido, verifica los datos.").isEmail(),
+      check("password", "La contraseña ingresada es inválida, verifica los datos.").not().isEmpty(),
+    ],
   ],
-    authController.loginUser
+  authController.loginUser
 );
 
 // @route  POST api/auth/google-oauth

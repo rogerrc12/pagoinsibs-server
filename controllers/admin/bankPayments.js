@@ -7,7 +7,7 @@ const User = require("../../models/user");
 const Bank = require("../../models/admin/bank");
 const FeeControl = require("../../models/feeControl");
 const Debit = require("../../models/debit");
-const AccPayment = require("../../models/accPayment");
+const AccPayment = require("../../models/payment");
 const readExcel = require("read-excel-file/node");
 const { addDays, addMonths } = require("../../helpers/functions");
 const { generateSiserFile } = require("../../helpers/excelFiles");
@@ -98,9 +98,7 @@ const updateSiserCorrelative = async (correlative) => {
 const processCiserFile = async (req, res, next) => {
   try {
     if (!req.file) {
-      const error = new Error(
-        "El archivo usado no es el correcto. Por favor utiliza un archivo con formato .xlsx e intenta de nuevo."
-      );
+      const error = new Error("El archivo usado no es el correcto. Por favor utiliza un archivo con formato .xlsx e intenta de nuevo.");
       error.statusCode = 404;
       throw error;
     }
@@ -133,9 +131,7 @@ const processCiserFile = async (req, res, next) => {
     const debits = await updateDebitStatusFromSiser(fileData);
 
     if (!payments && !debits) {
-      const error = new Error(
-        "No hay ningun pago para ser procesado en este lote. Revisa el archivo o intenta con" + " otro."
-      );
+      const error = new Error("No hay ningun pago para ser procesado en este lote. Revisa el archivo o intenta con" + " otro.");
       error.statusCode = 404;
       throw error;
     }
@@ -219,10 +215,7 @@ const updateDebitStatusFromSiser = async (data) => {
               { transaction: trx }
             );
 
-            await Debit.update(
-              { statusId: 1, startPaymentDate: paymentDate, attempts: 0 },
-              { where: { id: fee.debit.id }, transaction: trx }
-            );
+            await Debit.update({ statusId: 1, startPaymentDate: paymentDate, attempts: 0 }, { where: { id: fee.debit.id }, transaction: trx });
           } else {
             const feePaymentDate = await FeeControl.findOne({
               where: { statusId: 1, debitId: fee.debit.id },

@@ -1,60 +1,36 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { verify } = require('../../../middleware/auth');
-const { check, body } = require('express-validator/check');
+const { verify } = require("../../../middleware/auth");
+const { check, body } = require("express-validator/check");
 // controllers
-const paymentsController = require('../../../controllers/client/payments');
+const paymentsController = require("../../../controllers/client/payments");
 
 // @route  GET api/payments
 // @desc   Get all payments
 // @access Private
-router.get('/', verify, paymentsController.getPayments);
+router.get("/", verify, paymentsController.getPayments);
 
-// @route  GET api/payments/:type/:id
-// @desc   Get payment by type and id
+// @route  GET api/payments/:id
+// @desc   Get payment by id
 // @access Private
-router.get('/:type/:id', verify, paymentsController.getPaymentDetail);
+router.get("/:id", verify, paymentsController.getPaymentDetail);
 
-// @route  POST api/payments/account
+// @route  POST api/payments
 // @desc   Make & Create a new payment
 // @access Private
 router.post(
-  '/account',
+  "/",
   [
     verify,
     [
-      body('description')
-      .unescape(),
-      check('description', 'Hay un error en el formulario (la descripción es obligatoria).')
-      .not().isEmpty(),
-      check('amount', 'Hay un error en el formulario (el monto es obligatorio).')
-      .isCurrency()
-    ]
+      body("description").unescape(),
+      check("description", "Hay un error en la descripción.").not().isEmpty(),
+      check("amount", "Hay un error en el monto.").isDecimal(),
+      check("supplierId", "Hay un error en la empresa a pagar.").not().isEmpty(),
+      check("currencyId", "Hay un error en la moneda a pagar.").not().isEmpty(),
+    ],
   ],
-  paymentsController.createAccPayment
-);
-
-// @route  POST api/payments/creditcard
-// @desc   Make & Create a new payment
-// @access Private
-router.post(
-  '/creditcard',
-  [
-    verify,
-    [
-      body('description')
-      .unescape(),
-
-      check('description', 'Hay un error en el formulario (la descripción es obligatoria).')
-      .not().isEmpty()
-      .isLength({
-        max: 100
-      }),
-      check('amount', 'Hay un error en el formulario (el monto es obligatorio).')
-      .isCurrency()
-    ]
-  ],
-  paymentsController.createCcPayment
+  paymentsController.createPayment
 );
 
 module.exports = router;

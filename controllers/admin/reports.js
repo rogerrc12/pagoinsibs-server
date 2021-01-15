@@ -1,6 +1,6 @@
 const Debit = require("../../models/debit");
 const FeeControl = require("../../models/feeControl");
-const Payment = require("../../models/accPayment");
+const Payment = require("../../models/payment");
 const Bank = require("../../models/admin/bank");
 const User = require("../../models/user");
 const Supplier = require("../../models/admin/supplier");
@@ -65,9 +65,9 @@ const createReport = async (req, res, next) => {
         }
 
         workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar general desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(
-          endDate
-        ).format("DD-MM-YYYY")}.xlsx`;
+        fileName = `Cuotas pendientes por cobrar general desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
+          "DD-MM-YYYY"
+        )}.xlsx`;
         break;
       case "pending-bank":
         bank = await Bank.findByPk(bankId);
@@ -112,9 +112,9 @@ const createReport = async (req, res, next) => {
         }
 
         workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar para ${bank.bankName} desde ${moment(startDate).format(
+        fileName = `Cuotas pendientes por cobrar para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
           "DD-MM-YYYY"
-        )} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
+        )}.xlsx`;
         break;
       case "pending-supplier":
         const supplier = await Supplier.findByPk(supplierId);
@@ -158,9 +158,9 @@ const createReport = async (req, res, next) => {
         }
 
         workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar para ${supplier.name} desde ${moment(startDate).format(
+        fileName = `Cuotas pendientes por cobrar para ${supplier.name} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
           "DD-MM-YYYY"
-        )} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
+        )}.xlsx`;
         break;
       case "expired-payments":
         debits = await Debit.findAll({
@@ -196,9 +196,7 @@ const createReport = async (req, res, next) => {
         }
 
         workbook = reports.createExpiredReport(debits, payments);
-        fileName = `Cuotas vencidas desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-          "DD-MM-YYYY"
-        )}.xlsx`;
+        fileName = `Cuotas vencidas desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
         break;
       case "charged-payments":
         bank = await Bank.findByPk(bankId);
@@ -237,9 +235,9 @@ const createReport = async (req, res, next) => {
         }
 
         workbook = reports.createChargedReport(debits, payments);
-        fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format(
+        fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
           "DD-MM-YYYY"
-        )} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
+        )}.xlsx`;
 
         break;
       default:

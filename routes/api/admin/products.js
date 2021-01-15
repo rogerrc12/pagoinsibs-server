@@ -1,31 +1,37 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { check, body } = require('express-validator/check');
-const { verify } = require('../../../middleware/auth');
+const { check, body } = require("express-validator/check");
+const { verify } = require("../../../middleware/auth");
 // controllers
-const productsController = require('../../../controllers/admin/products');
+const productsController = require("../../../controllers/admin/products");
 
-// @route  GET admin/products/:supplier_id
+// @route  GET admin/products
+// @desc   Get all products
+// @access Private
+router.get("/", verify, productsController.getProducts);
+
+// @route  GET admin/products/:supplierId
 // @desc   Get all products from supplier id
 // @access Private
-router.get('/:supplier_id', verify, productsController.getProducts);
+router.get("/:supplierId", verify, productsController.getProductsBySupplier);
 
 // @route  GET admin/products/data/:id
 // @desc   Get all products from product id
 // @access Private
-router.get('/data/:id', verify, productsController.getProductData);
+router.get("/data/:id", verify, productsController.getProductData);
 
-// @route  POST admin/products/:supplier_id
+// @route  POST admin/products/:supplierId
 // @desc   Add a product to the supplier
 // @access Private
-router.post('/:supplier_id', 
+router.post(
+  "/:supplierId",
   [
     verify,
     [
-      body('product_name').unescape(),
-      check('product_name', 'Hay un error en el formulario (revisa el nombre)').not().isEmpty(),
-      check('product_amount', 'Hay un error en el formulario (revisa el monto)').not().isEmpty()
-    ]
+      body("name").unescape(),
+      check("name", "Hay un error en el formulario (revisa el nombre)").not().isEmpty(),
+      check("amount", "Hay un error en el formulario (revisa el monto)").not().isEmpty(),
+    ],
   ],
   productsController.addProduct
 );
@@ -33,12 +39,11 @@ router.post('/:supplier_id',
 // @route  PUT admin/products/:product_id
 // @desc   edit product amount of supplier
 // @access Private
-router.put('/:supplier_id/:product_id', verify, productsController.editProduct );
+router.put("/:productId", verify, productsController.editProduct);
 
-// @route  DELETE admin/products/:product_id
+// @route  DELETE admin/products/:supplierId/:productId
 // @desc   delete product of supplier
 // @access Private
-router.delete('/:supplier_id/:product_id', verify, productsController.deleteProduct );
-
+router.delete("/:supplierId/:productId", verify, productsController.deleteProduct);
 
 module.exports = router;

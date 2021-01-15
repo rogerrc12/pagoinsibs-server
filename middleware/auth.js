@@ -16,7 +16,7 @@ module.exports = {
       issuer: options.issuer,
       subject: options.subject,
       audience: options.audience,
-      expiresIn: "1h",
+      expiresIn: "24h",
       algorithm: "RS256",
     };
 
