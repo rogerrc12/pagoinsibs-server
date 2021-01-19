@@ -18,6 +18,7 @@ const Payment = db.define("payment", {
   accNumber: DataTypes.STRING(20),
   bankName: DataTypes.STRING(50),
   accType: DataTypes.STRING(15),
+  withCurrencyConversion: { type: DataTypes.BOOLEAN, defaultValue: false },
   paypalEmail: DataTypes.STRING,
   zelleEmail: DataTypes.STRING,
   cardBrand: DataTypes.STRING(6),
