@@ -1,14 +1,35 @@
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const aws = require("aws-sdk");
+const shortid = require("shortid");
+const multerS3 = require("multer-s3");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "..", "uploads"));
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname.split(".")[0] + "_" + new Date().toISOString() + ".xlsx");
-  },
+aws.config.update({
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  accessKeyId: process.env.AWS_KEY_ID,
+  region: "us-east-2",
+});
+
+const s3 = new aws.S3();
+
+const fileStorage = multerS3({
+  s3,
+  bucket: "pagoinsibs",
+  acl: "public-read",
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  metadata: (req, file, cb) => cb(null, { fieldName: file.fieldname }),
+  key: (req, file, cb) => cb(null, file.originalname.split(".")[0] + "_" + new Date().toISOString() + ".xlsx"),
+});
+
+const imageStorage = multerS3({
+  s3,
+  bucket: "pagoinsibs",
+  acl: "public-read",
+  contentDisposition: "inline",
+  contentType: multerS3.AUTO_CONTENT_TYPE,
+  metadata: (req, file, cb) => cb(null, { fieldName: file.fieldname }),
+  key: (req, file, cb) => cb(null, shortid.generate() + "-" + file.originalname),
 });
 
 const fileFilter = (req, file, cb) => {
@@ -28,7 +49,8 @@ const deleteFile = (path) => {
 };
 
 module.exports = {
-  storage,
+  fileStorage,
+  imageStorage,
   fileFilter,
   deleteFile,
 };

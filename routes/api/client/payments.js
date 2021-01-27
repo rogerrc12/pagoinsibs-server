@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { verify } = require("../../../middleware/auth");
+const { imageStorage } = require("../../../helpers/multerConfig");
 const { check, body } = require("express-validator/check");
+const multer = require("multer");
 // controllers
 const paymentsController = require("../../../controllers/client/payments");
 
@@ -22,6 +24,7 @@ router.post(
   "/",
   [
     verify,
+    multer({ storage: imageStorage }).single("zelleFile"),
     [
       body("description").unescape(),
       check("description", "Hay un error en la descripción.").not().isEmpty(),

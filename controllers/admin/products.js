@@ -82,24 +82,23 @@ const addProduct = async (req, res, next) => {
 
 const editProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const { amount, maxDebitMonths, interestRate, name, currencyId, isDirectDebit } = req.body;
+  const { amount, maxDebitMonths, interestRate, name, currencyId, currencyConversion, isDirectDebit } = req.body;
 
   try {
     const product = await Product.findByPk(productId);
 
     if (!product) {
-      const error = new Error(
-        "No se ha encontrado el producto, por favor recarga la página e intenta de nuevo. Si el problema persiste contacta a soporte."
-      );
+      const error = new Error("No se ha encontrado el producto, por favor recarga la página e intenta de nuevo. Si el problema persiste contacta a soporte.");
       error.statusCode = 404;
       throw error;
     }
 
     product.amount = amount;
     product.isDirectDebit = isDirectDebit;
-    product.interestRate = interestRate || null;
-    product.maxDebitMonths = maxDebitMonths || null;
+    product.interestRate = !isDirectDebit ? null : interestRate || null;
+    product.maxDebitMonths = !isDirectDebit ? null : maxDebitMonths || null;
     product.name = name;
+    product.currencyConversion = currencyConversion;
     product.currencyId = currencyId;
 
     await product.save();

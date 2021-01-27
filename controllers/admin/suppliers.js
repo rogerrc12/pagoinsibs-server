@@ -32,7 +32,7 @@ const getProfile = async (req, res, next) => {
         { model: Status, attributes: ["name"], required: true },
         { model: User, attributes: ["firstName", "lastName", "cedula"], required: true },
       ],
-      attributes: ["description", ["totalAmount", "amount"], "createdAt"],
+      attributes: ["description", "amount", "createdAt"],
     });
     const accPayments = await AccPayment.findAll({
       where: { supplierId: id },
@@ -121,7 +121,7 @@ const postSupplier = async (req, res, next) => {
 };
 
 const editSupplier = async (req, res, next) => {
-  const { supplier_type, name, rif, address, city, state, manager_fname, manager_lname, local_phone, mobile_phone, email } = req.body;
+  const { name, rif, address, city, state, manager_fname, manager_lname, local_phone, mobile_phone, email } = req.body;
   const { id } = req.params;
 
   try {

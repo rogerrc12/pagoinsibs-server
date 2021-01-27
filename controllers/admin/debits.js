@@ -168,13 +168,13 @@ const processFee = async (debit) => {
         await Debit.update({ startPaymentDate: paymentDate, attempts: 0 }, { where: { id: debit.id }, transaction: trx });
       } else {
         const feePaymentDate = await FeeControl.findOne({
-          where: { statusId: 1, debitId: debit.id },
+          where: { statusId: 1, debitId: fee.debitId },
           attributes: ["paymentDate"],
         });
 
         await Debit.update(
           {
-            startPaymentDate: !feePaymentDate.paymentDate ? debit.startPaymentDate : feePaymentDate.paymentDate,
+            startPaymentDate: feePaymentDate.paymentDate || debit.startPaymentDate,
             remainingAmount: Number(debit.remainingAmount) - Number(debit.feeAmount),
             remainingPayments: Number(debit.remainingPayments) - 1,
             attempts: 0,
@@ -285,6 +285,30 @@ const getDebitFees = async (req, res, next) => {
   }
 };
 
+const updateDebitPriceFromCurrencyPrice = async (buyPrice, sellPrice) => {
+  try {
+    const allPendingDebits = await Debit.findAll({ where: { statusId: 1, currencyId: 1, withCurrencyConversion: true } });
+
+    for (let debit of allPendingDebits) {
+      const product = await Product.findByPk(debit.productId);
+
+      if (debit.debitType === "fraccionado") {
+        const newAmount = +product.amount * (+product.interestRate + 1) * +buyPrice;
+        const newFeeAmount = newAmount / +debit.paymentFrequency;
+        const newRemainingAmount = (newAmount / +debit.paymentFrequency) * +debit.remainingPayments;
+        debit.totalAmount = newAmount;
+        debit.feeTotalAmount = newAmount;
+        debit.remainingAmount = newRemainingAmount;
+        debit.feeAmount = newFeeAmount;
+
+        await debit.save();
+      }
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 const cancelDebit = async (req, res, next) => {
   const { id } = req.params;
 
@@ -323,5 +347,6 @@ module.exports = {
   getDebitDetail,
   postDebitToBank,
   postDebitsToBankInBulk,
+  updateDebitPriceFromCurrencyPrice,
   cancelDebit,
 };

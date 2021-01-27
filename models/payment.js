@@ -20,7 +20,8 @@ const Payment = db.define("payment", {
   accType: DataTypes.STRING(15),
   withCurrencyConversion: { type: DataTypes.BOOLEAN, defaultValue: false },
   paypalEmail: DataTypes.STRING,
-  zelleEmail: DataTypes.STRING,
+  paypalPaymentId: DataTypes.STRING,
+  zelleFileUrl: DataTypes.STRING,
   cardBrand: DataTypes.STRING(6),
   cardLastNumbers: DataTypes.STRING(4),
 });

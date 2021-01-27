@@ -1,6 +1,8 @@
 const Currency = require("../models/currency");
 const { validationResult } = require("express-validator/check");
 
+const { updateDebitPriceFromCurrencyPrice } = require("./admin/debits");
+
 const getCurrencies = async (req, res, next) => {
   try {
     const currencies = await Currency.findAll();
@@ -42,7 +44,10 @@ const editCurrency = async (req, res, next) => {
     currency.symbol = symbol;
     currency.buyPrice = buyPrice;
     currency.sellPrice = sellPrice;
-    await currency.save();
+    const result = await currency.save();
+
+    if (result.id) await updateDebitPriceFromCurrencyPrice(buyPrice, sellPrice);
+
     return res.status(200).send("La moneda fue guardada correctamente.");
   } catch (error) {
     error.statusCode = 500;

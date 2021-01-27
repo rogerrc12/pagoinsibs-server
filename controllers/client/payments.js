@@ -150,7 +150,7 @@ const createPayment = async function (req, res, next) {
       }
     }
 
-    const { description, amount, supplierId, accountId, paymentType, productId, currencyId, cardNumber, zelleEmail, paypalEmail } = req.body;
+    const { description, amount, supplierId, accountId, paymentType, productId, currencyId, cardNumber, paypalEmail, paypalPaymentId, withCurrencyConversion } = req.body;
 
     let accountData;
 
@@ -168,6 +168,7 @@ const createPayment = async function (req, res, next) {
       statusId: 1,
       paymentType,
       currencyId,
+      withCurrencyConversion,
     };
 
     if (accountId && paymentType === "account") {
@@ -196,10 +197,12 @@ const createPayment = async function (req, res, next) {
         paymentValues.cardBrand = Number(cardNumber.substring(0, 1)) === 4 ? "VISA" : Number(cardNumber.substring(0, 1)) === 5 ? "MASTER" : "OTROS";
         paymentValues.cardLastNumbers = cardNumber.replace(/\s/g, "").substring(12, 16);
       }
-    } else if (zelleEmail && paymentType === "zelle") {
-      paymentValues.zelleEmail = zelleEmail;
-    } else if (paypalEmail && paymentType === "paypal") {
+    } else if (paymentType === "zelle") {
+      paymentValues.zelleFileUrl = req.file.location;
+    } else if (paymentType === "paypal") {
       paymentValues.paypalEmail = paypalEmail;
+      paymentValues.paypalPaymentId = paypalPaymentId;
+      paymentValues.statusId = 3;
     } else {
       const error = new Error("No se ha encontrado una opción de pago válida. Si cree que esto es un error, por favor contacte a soporte.");
       error.statusCode = 404;
@@ -210,7 +213,7 @@ const createPayment = async function (req, res, next) {
     return res.status(200).json(newPayment);
 
     // const supplier = await Supplier.findByPk(supplier_id);
-    // return await sendPaymentEmails(supplier, newPayment, req.user, "Con cuenta");
+    // sendPaymentEmails(supplier, newPayment, req.user, "Con cuenta");
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);

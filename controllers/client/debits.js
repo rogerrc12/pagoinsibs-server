@@ -127,7 +127,21 @@ const createDebit = async (req, res, next) => {
     throw error;
   }
 
-  const { accountId, supplierId, currencyId, productId, description, totalAmount, debitType, startPaymentDate, paymentPeriod, paymentType, paymentFrequency, feeAmount } = req.body;
+  const {
+    accountId,
+    supplierId,
+    currencyId,
+    productId,
+    description,
+    totalAmount,
+    debitType,
+    startPaymentDate,
+    paymentPeriod,
+    paymentType,
+    paymentFrequency,
+    feeAmount,
+    withCurrencyConversion,
+  } = req.body;
 
   try {
     // Look for a payment with similar amount and supplier
@@ -165,6 +179,7 @@ const createDebit = async (req, res, next) => {
       remainingPayments: paymentFrequency > 0 ? paymentFrequency : null,
       remainingAmount: +totalAmount,
       feeAmount: feeAmount > 0 ? feeAmount : +totalAmount,
+      withCurrencyConversion,
       statusId: 1,
       debitKey,
     };
