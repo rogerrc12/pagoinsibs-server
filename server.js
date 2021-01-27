@@ -57,7 +57,7 @@ app.use((error, req, res, next) => {
 
   try {
     await relateTables();
-    await db.sync({ alter: true });
+    await db.sync({ force: true, alter: true });
     await db.authenticate();
     await createSequencesTables();
 
