@@ -16,7 +16,6 @@ module.exports = {
   },
   production: {
     use_env_variable: "DATABASE_URL",
-    operatorsAliases: false,
     dialectOptions: {
       ssl: {
         require: true,

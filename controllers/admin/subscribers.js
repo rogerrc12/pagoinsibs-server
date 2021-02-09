@@ -1,8 +1,11 @@
 const User = require("../../models/user");
 const Account = require("../../models/account");
-const AccPayment = require("../../models/payment");
+const Payment = require("../../models/payment");
 const Bank = require("../../models/admin/bank");
 const Status = require("../../models/status");
+const Supplier = require("../../models/admin/supplier");
+const Currency = require("../../models/currency");
+const Debit = require("../../models/debit");
 
 const getSubscribers = async (req, res, next) => {
   try {
@@ -21,13 +24,19 @@ const getProfile = async (req, res, next) => {
     const user = await User.findByPk(id, {
       include: [
         { model: Account, include: Bank },
-        { model: AccPayment, include: Status },
+        { model: Payment, include: [{ model: Status }, { model: Currency }, { model: Supplier }] },
+        { model: Debit, include: [{ model: Status }, { model: Currency }, { model: Supplier }] },
+      ],
+      order: [
+        [Payment, "createdAt", "DESC"],
+        [Debit, "createdAt", "DESC"],
       ],
     });
+
     const profile = {
       information: user,
       accounts: user.accounts,
-      payments: user.accPayments,
+      payments: [...user.payments, ...user.debits],
     };
 
     return res.status(200).json(profile);

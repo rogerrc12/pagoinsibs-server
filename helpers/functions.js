@@ -27,19 +27,19 @@ function addDays(date, days) {
 function addMonths(date, months) {
   const newDate = new Date(Number(date));
   newDate.setMonth(date.getMonth() + months);
-  return newDate; 
+  return newDate;
 }
 
-function formatAmountBs(amount) {
-  return `${Number(amount).toLocaleString("es-ES", {
+function formatAmount(amount) {
+  return Number(amount).toLocaleString("es-ES", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })} Bs.`;
+  });
 }
 
 module.exports = {
   calculateEndDate,
   addDays,
   addMonths,
-  formatAmountBs
+  formatAmount,
 };

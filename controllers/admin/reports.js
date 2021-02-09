@@ -4,13 +4,15 @@ const Payment = require("../../models/payment");
 const Bank = require("../../models/admin/bank");
 const User = require("../../models/user");
 const Supplier = require("../../models/admin/supplier");
+const Currency = require("../../models/currency");
 const reports = require("../../helpers/excelFiles");
 const { Op } = require("sequelize");
 const moment = require("moment");
 const { validationResult } = require("express-validator/check");
 
 const createReport = async (req, res, next) => {
-  const { fromDate, toDate, bankId, supplierId } = req.body;
+  const { fromDate, toDate, bankId, supplierId, currencyId } = req.body;
+
   const { report_type } = req.params;
   const errors = validationResult(req);
 
@@ -35,9 +37,11 @@ const createReport = async (req, res, next) => {
           include: [
             {
               model: Debit,
+              where: { statusId: 1, currencyId },
               include: [
                 { model: User, attributes: ["firstName", "lastName", "cedula"] },
                 { model: Supplier, attributes: ["name", "rif"] },
+                { model: Currency, attributes: ["name", "symbol"] },
               ],
             },
           ],
@@ -50,10 +54,12 @@ const createReport = async (req, res, next) => {
             startPaymentDate: {
               [Op.between]: [startDate, endDate],
             },
+            currencyId,
           },
           include: [
             { model: User, attributes: ["firstName", "lastName", "cedula"] },
             { model: Supplier, attributes: ["name", "rif"] },
+            { model: Currency, attributes: ["name", "symbol"] },
           ],
           order: [["startPaymentDate", "DESC"]],
         });
@@ -64,10 +70,8 @@ const createReport = async (req, res, next) => {
           throw error;
         }
 
-        workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar general desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-          "DD-MM-YYYY"
-        )}.xlsx`;
+        workbook = reports.createPendingReport(fees, payments, currencyId);
+        fileName = `Cuotas pendientes por cobrar general desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
         break;
       case "pending-bank":
         bank = await Bank.findByPk(bankId);
@@ -80,10 +84,11 @@ const createReport = async (req, res, next) => {
           include: [
             {
               model: Debit,
-              where: { bankName: bank.bankName, statusId: 1 },
+              where: { bankName: bank.bankName, statusId: 1, currencyId },
               include: [
                 { model: User, attributes: ["firstName", "lastName", "cedula"] },
                 { model: Supplier, attributes: ["name", "rif"] },
+                { model: Currency, attributes: ["name", "symbol"] },
               ],
             },
           ],
@@ -97,10 +102,12 @@ const createReport = async (req, res, next) => {
             startPaymentDate: {
               [Op.between]: [startDate, endDate],
             },
+            currencyId,
           },
           include: [
             { model: User, attributes: ["firstName", "lastName", "cedula"] },
             { model: Supplier, attributes: ["name", "rif"] },
+            { model: Currency, attributes: ["name", "symbol"] },
           ],
           order: [["startPaymentDate", "DESC"]],
         });
@@ -111,10 +118,8 @@ const createReport = async (req, res, next) => {
           throw error;
         }
 
-        workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-          "DD-MM-YYYY"
-        )}.xlsx`;
+        workbook = reports.createPendingReport(fees, payments, currencyId);
+        fileName = `Cuotas pendientes por cobrar para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
         break;
       case "pending-supplier":
         const supplier = await Supplier.findByPk(supplierId);
@@ -127,10 +132,11 @@ const createReport = async (req, res, next) => {
           include: [
             {
               model: Debit,
-              where: { supplierId, statusId: 1 },
+              where: { supplierId, statusId: 1, currencyId },
               include: [
                 { model: User, attributes: ["firstName", "lastName", "cedula"] },
                 { model: Supplier, attributes: ["name", "rif"] },
+                { model: Currency, attributes: ["name", "symbol"] },
               ],
             },
           ],
@@ -143,10 +149,12 @@ const createReport = async (req, res, next) => {
             startPaymentDate: {
               [Op.between]: [startDate, endDate],
             },
+            currencyId,
           },
           include: [
             { model: User, attributes: ["firstName", "lastName", "cedula"] },
             { model: Supplier, attributes: ["name", "rif"] },
+            { model: Currency, attributes: ["name", "symbol"] },
           ],
           order: [["startPaymentDate", "DESC"]],
         });
@@ -157,10 +165,8 @@ const createReport = async (req, res, next) => {
           throw error;
         }
 
-        workbook = reports.createPendingReport(fees, payments);
-        fileName = `Cuotas pendientes por cobrar para ${supplier.name} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-          "DD-MM-YYYY"
-        )}.xlsx`;
+        workbook = reports.createPendingReport(fees, payments, currencyId);
+        fileName = `Cuotas pendientes por cobrar para ${supplier.name} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
         break;
       case "expired-payments":
         debits = await Debit.findAll({
@@ -169,10 +175,12 @@ const createReport = async (req, res, next) => {
             startPaymentDate: {
               [Op.between]: [startDate, endDate],
             },
+            currencyId,
           },
           include: [
             { model: Supplier, attributes: ["name", "rif"] },
             { model: User, attributes: ["firstName", "lastName", "cedula", "email", "phone"] },
+            { model: Currency, attributes: ["name", "symbol"] },
           ],
         });
 
@@ -182,10 +190,12 @@ const createReport = async (req, res, next) => {
             startPaymentDate: {
               [Op.between]: [startDate, endDate],
             },
+            currencyId,
           },
           include: [
             { model: Supplier, attributes: ["name", "rif"] },
             { model: User, attributes: ["firstName", "lastName", "cedula", "email", "phone"] },
+            { model: Currency, attributes: ["name", "symbol"] },
           ],
         });
 
@@ -195,7 +205,7 @@ const createReport = async (req, res, next) => {
           throw error;
         }
 
-        workbook = reports.createExpiredReport(debits, payments);
+        workbook = reports.createExpiredReport(debits, payments, currencyId);
         fileName = `Cuotas vencidas desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
         break;
       case "charged-payments":
@@ -228,16 +238,18 @@ const createReport = async (req, res, next) => {
           ],
         });
 
-        if (debits.length === 0 && payments.length === 0) {
-          const error = new Error("No se encontraron entradas en este rango de fecha.");
-          error.statusCode = 404;
-          throw error;
-        }
+        console.log(debits, payments);
 
-        workbook = reports.createChargedReport(debits, payments);
-        fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-          "DD-MM-YYYY"
-        )}.xlsx`;
+        // if (debits.length === 0 && payments.length === 0) {
+        //   const error = new Error("No se encontraron entradas en este rango de fecha.");
+        //   error.statusCode = 404;
+        //   throw error;
+        // }
+
+        // workbook = reports.createChargedReport(debits, payments);
+        // fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
+        //   "DD-MM-YYYY"
+        // )}.xlsx`;
 
         break;
       default:
