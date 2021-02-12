@@ -27,7 +27,7 @@ router.post(
       check("description", "Hay un error en la descripción.").not().isEmpty(),
       check("supplierId", "Hay un error en la empresa a pagar.").not().isEmpty(),
       check("currencyId", "Hay un error en la moneda a pagar.").not().isEmpty(),
-      check("totalAmount", "Hay un error en el formulario (agrega un monto correcto).").isNumeric(),
+      check("amount", "Hay un error en el formulario (agrega un monto correcto).").isNumeric(),
       check("startPaymentDate", "Hay un error en el formulario (debes seleccionar la fecha de inicio de tu cobro).").not().isEmpty(),
       check("productId", "Hay un error en el formulario (el producto es obligatorio)").not().isEmpty(),
       check("debitType", "Hay un error en el formulario (como serán tus pagos es obligatorio).").not().isEmpty(),

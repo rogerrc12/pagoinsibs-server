@@ -296,8 +296,7 @@ const updateDebitPriceFromCurrencyPrice = async (buyPrice, sellPrice) => {
         const newAmount = +product.amount * (+product.interestRate + 1) * +buyPrice;
         const newFeeAmount = newAmount / +debit.paymentFrequency;
         const newRemainingAmount = (newAmount / +debit.paymentFrequency) * +debit.remainingPayments;
-        debit.totalAmount = newAmount;
-        debit.feeTotalAmount = newAmount;
+        debit.amount = newAmount;
         debit.remainingAmount = newRemainingAmount;
         debit.feeAmount = newFeeAmount;
 

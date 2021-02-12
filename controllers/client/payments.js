@@ -19,6 +19,7 @@ const Account = require("../../models/account");
 const Status = require("../../models/status");
 const Currency = require("../../models/currency");
 const Supplier = require("../../models/admin/supplier");
+const Product = require("../../models/admin/product");
 
 const getPayments = async function (req, res, next) {
   try {
@@ -35,7 +36,7 @@ const getPaymentDetail = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const payment = await Payment.findByPk(id, { include: [{ model: Supplier }, { model: Status }, { model: Currency }] });
+    const payment = await Payment.findByPk(id, { include: [{ model: Supplier }, { model: Product }, { model: Status }, { model: Currency }] });
 
     return res.json(payment);
   } catch (error) {

@@ -30,10 +30,10 @@ const getDebits = async (req, res, next) => {
 };
 
 const getSimilarDebit = async (body) => {
-  const { productId, totalAmount, feeAmount } = body;
+  const { productId, amount, feeAmount } = body;
   return Debit.findAll({
     where: {
-      feeAmount: !feeAmount ? +totalAmount : +feeAmount,
+      feeAmount: !feeAmount ? +amount : +feeAmount,
       productId,
     },
     raw: true,
@@ -133,7 +133,7 @@ const createDebit = async (req, res, next) => {
     currencyId,
     productId,
     description,
-    totalAmount,
+    amount,
     debitType,
     startPaymentDate,
     paymentPeriod,
@@ -168,8 +168,7 @@ const createDebit = async (req, res, next) => {
       productId,
       description,
       currencyId,
-      totalAmount: +totalAmount,
-      feeTotalAmount: +totalAmount,
+      amount: +amount,
       debitType,
       paymentType,
       startPaymentDate,
@@ -177,8 +176,8 @@ const createDebit = async (req, res, next) => {
       paymentPeriod,
       paymentFrequency: paymentFrequency > 0 ? paymentFrequency : null,
       remainingPayments: paymentFrequency > 0 ? paymentFrequency : null,
-      remainingAmount: +totalAmount,
-      feeAmount: feeAmount > 0 ? feeAmount : +totalAmount,
+      remainingAmount: +amount,
+      feeAmount: feeAmount > 0 ? feeAmount : +amount,
       withCurrencyConversion,
       statusId: 1,
       debitKey,

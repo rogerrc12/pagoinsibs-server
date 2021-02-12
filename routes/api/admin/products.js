@@ -36,14 +36,14 @@ router.post(
   productsController.addProduct
 );
 
-// @route  PUT admin/products/:product_id
+// @route  PUT admin/products/:productId
 // @desc   edit product amount of supplier
 // @access Private
 router.put("/:productId", verify, productsController.editProduct);
 
-// @route  DELETE admin/products/:supplierId/:productId
+// @route  DELETE admin/products/:productId
 // @desc   delete product of supplier
 // @access Private
-router.delete("/:supplierId/:productId", verify, productsController.deleteProduct);
+router.delete("/:productId", verify, productsController.deleteProduct);
 
 module.exports = router;

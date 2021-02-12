@@ -111,10 +111,10 @@ const editProduct = async (req, res, next) => {
 };
 
 const deleteProduct = async (req, res, next) => {
-  const { supplierId, productId } = req.params;
+  const { productId } = req.params;
 
   try {
-    await Product.destroy({ where: { id: productId, supplierId } });
+    await Product.destroy({ where: { id: productId } });
 
     return res.status(200).json({ message: "Producto eliminado correctamente." });
   } catch (error) {
