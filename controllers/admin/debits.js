@@ -167,14 +167,14 @@ const processFee = async (debit) => {
 
         await Debit.update({ startPaymentDate: paymentDate, attempts: 0 }, { where: { id: debit.id }, transaction: trx });
       } else {
-        const feePaymentDate = await FeeControl.findOne({
+        const nextFee = await FeeControl.findOne({
           where: { statusId: 1, debitId: fee.debitId },
           attributes: ["paymentDate"],
         });
 
         await Debit.update(
           {
-            startPaymentDate: feePaymentDate.paymentDate || debit.startPaymentDate,
+            startPaymentDate: nextFee.paymentDate,
             remainingAmount: Number(debit.remainingAmount) - Number(debit.feeAmount),
             remainingPayments: Number(debit.remainingPayments) - 1,
             attempts: 0,

@@ -1,10 +1,10 @@
 const path = require("path");
-const db = require("../../config/db");
+// const db = require("../../config/db");
 const { v4 } = require("uuid");
 const instapago = require("instapago");
 const moment = require("moment");
 const mail = require("../../mail/config");
-const ccGateway = instapago(process.env.NODE_ENV !== "production" ? process.env.INSTAPAGO_TEST_KEY : process.env.INSTAPAGO_KEY, process.env.INSTAPAGO_PUBLICKEY);
+const ccGateway = instapago(process.env.INSTAPAGO_KEY, process.env.INSTAPAGO_PUBLICKEY);
 const { validationResult } = require("express-validator/check");
 const { sendPaymentEmails } = require("../../helpers/sendMail");
 const { addDays } = require("../../helpers/functions");
