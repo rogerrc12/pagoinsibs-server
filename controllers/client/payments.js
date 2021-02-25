@@ -4,7 +4,7 @@ const { v4 } = require("uuid");
 const instapago = require("instapago");
 const moment = require("moment");
 const mail = require("../../mail/config");
-const ccGateway = instapago(process.env.INSTAPAGO_KEY, process.env.INSTAPAGO_PUBLICKEY);
+const ccGateway = instapago(process.env.NODE_ENV !== "production" ? process.env.INSTAPAGO_TEST_KEY : process.env.INSTAPAGO_KEY, process.env.INSTAPAGO_PUBLICKEY);
 const { validationResult } = require("express-validator/check");
 const { sendPaymentEmails } = require("../../helpers/sendMail");
 const { addDays } = require("../../helpers/functions");
@@ -211,10 +211,11 @@ const createPayment = async function (req, res, next) {
     }
 
     const newPayment = await Payment.create(paymentValues);
-    return res.status(200).json(newPayment);
+    const supplier = await Supplier.findByPk(supplierId);
 
-    // const supplier = await Supplier.findByPk(supplier_id);
-    // sendPaymentEmails(supplier, newPayment, req.user, "Con cuenta");
+    sendPaymentEmails(supplier, paymentValues, req.user);
+
+    return res.status(200).json(newPayment);
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);

@@ -217,10 +217,11 @@ const createDebit = async (req, res, next) => {
       return newDebit;
     });
 
-    res.status(200).json(newDirectDebit);
+    const supplier = await Supplier.findByPk(supplierId);
+    const product = await Product.findByPk(productId);
+    sendDebitEmails(supplier, directDebit, product, req.user);
 
-    // const supplier = await Supplier.findByPk(supplier_id);
-    // return await sendDebitEmails(supplier, newDirectDebit, req.user);
+    return res.status(200).json(newDirectDebit);
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);
