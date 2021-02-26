@@ -168,7 +168,7 @@ const processFee = async (debit) => {
         await Debit.update({ startPaymentDate: paymentDate, attempts: 0 }, { where: { id: debit.id }, transaction: trx });
       } else {
         const nextFee = await FeeControl.findOne({
-          where: { statusId: 1, debitId: fee.debitId },
+          where: { statusId: 1, debitId: fee.debitId, paymentDate: { [Op.gt]: moment().toDate() } },
           attributes: ["paymentDate"],
         });
 
@@ -287,21 +287,19 @@ const getDebitFees = async (req, res, next) => {
 
 const updateDebitPriceFromCurrencyPrice = async (buyPrice, sellPrice) => {
   try {
-    const allPendingDebits = await Debit.findAll({ where: { statusId: 1, currencyId: 1, withCurrencyConversion: true } });
+    const allPendingDebits = await Debit.findAll({ where: { statusId: 1, currencyId: 2, withCurrencyConversion: true } });
 
     for (let debit of allPendingDebits) {
       const product = await Product.findByPk(debit.productId);
 
-      if (debit.debitType === "fraccionado") {
-        const newAmount = +product.amount * (+product.interestRate + 1) * +buyPrice;
-        const newFeeAmount = newAmount / +debit.paymentFrequency;
-        const newRemainingAmount = (newAmount / +debit.paymentFrequency) * +debit.remainingPayments;
-        debit.amount = newAmount;
-        debit.remainingAmount = newRemainingAmount;
-        debit.feeAmount = newFeeAmount;
+      const newAmount = +product.amount * (+product.interestRate + 1) * +sellPrice;
+      const newFeeAmount = debit.paymentFrequency ? newAmount / +debit.paymentFrequency : newAmount;
+      const newRemainingAmount = debit.paymentFrequency ? (newAmount / +debit.paymentFrequency) * +debit.remainingPayments : newAmount;
+      debit.amount = newAmount;
+      debit.remainingAmount = newRemainingAmount;
+      debit.feeAmount = newFeeAmount;
 
-        await debit.save();
-      }
+      await debit.save();
     }
   } catch (error) {
     throw error;

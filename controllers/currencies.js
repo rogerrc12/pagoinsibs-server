@@ -46,7 +46,7 @@ const editCurrency = async (req, res, next) => {
     currency.sellPrice = sellPrice;
     const result = await currency.save();
 
-    if (result.id) await updateDebitPriceFromCurrencyPrice(buyPrice, sellPrice);
+    if (result) await updateDebitPriceFromCurrencyPrice(buyPrice, sellPrice);
 
     return res.status(200).send("La moneda fue guardada correctamente.");
   } catch (error) {
