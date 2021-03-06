@@ -16,7 +16,7 @@ module.exports = {
       issuer: options.issuer,
       subject: options.subject,
       audience: options.audience,
-      expiresIn: "24h",
+      expiresIn: "1h",
       algorithm: "RS256",
     };
 
@@ -40,11 +40,12 @@ module.exports = {
       issuer: options.issuer,
       subject: options.subject,
       audience: options.audience,
-      expiresIn: "8h",
+      expiresIn: "10h",
       algorithm: "RS256",
     };
 
-    return jwt.sign(payload, privateKey, signOptions);
+    const result = jwt.sign(payload, privateKey, signOptions);
+    return { token: result, expiresIn: 36000 };
   },
 
   verify: (req, res, next) => {
