@@ -5,17 +5,17 @@ const { formatAmount } = require("./functions");
 const sendPaymentEmails = async (supplier, payment, user) => {
   // send email to user
   const userOptions = {
-    email: user.email,
-    subject: `Solicitud de pago generada`,
+    email: user.secondaryEmail ? [user.email, user.secondaryEmail] : user.email,
+    subject: "Nueva solicitud de pago",
     template: "account_payment_sender",
     variables: JSON.stringify({
       name: user.name,
       payment_id: payment.id,
+      payment_type: `Pago con ${payment.paymentType === "account" ? "cuenta" : payment.paymentType}`,
       supplier_name: supplier.name,
       date_issued: moment(payment.createdAt).format("DD-MM-YYYY [a las] hh:mm a"),
-      amount: `${formatAmount(payment.amount)} ${payment.currencyId === 1 ? "$" : "Bs."}`,
+      amount: formatAmount(payment.amount),
       description: payment.description,
-      payment_type: payment.paymentType,
     }),
   };
   await mail.send(userOptions);
@@ -40,11 +40,12 @@ const sendPaymentEmails = async (supplier, payment, user) => {
   // Send email to the system
   const systemOptions = {
     email: "cobranzadigital@insibs.com",
-    subject: `Se ha generado un nuevo pago único`,
+    subject: "Se ha generado un nuevo pago",
     template: "new_acc_payment",
     variables: JSON.stringify({
       userName: user.name,
       date: moment(payment.createdAt).format("DD-MM-YYYY [a las] hh:mm a"),
+      paymentType: `Pago con ${payment.paymentType === "account" ? "cuenta" : payment.paymentType}`,
       userCedula: user.cedula,
       adminAddress: "https://admn.pagoinsibs.com",
     }),
@@ -55,8 +56,8 @@ const sendPaymentEmails = async (supplier, payment, user) => {
 const sendDebitEmails = async (supplier, debit, product, user) => {
   // Send email to user
   const debitOptions = {
-    email: user.email,
-    subject: `Solicitud de domiciliación generada`,
+    email: user.secondaryEmail ? [user.email, user.secondaryEmail] : user.email,
+    subject: `Has creado una nueva domiciliación`,
     template: "direct_debit_sender",
     variables: JSON.stringify({
       name: user.name,

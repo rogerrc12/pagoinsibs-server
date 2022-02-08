@@ -12,7 +12,7 @@ const path = require("path");
 const { v4 } = require("uuid");
 const mail = require("../../mail/config");
 const { calculateEndDate, addDays } = require("../../helpers/functions");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 const moment = require("moment");
 const PDFDocuemnt = require("pdfkit");
 const { generatePdfFooter, generatePdfHeader, generateDebitInfo, generateFeesTable } = require("../../helpers/pdf");
@@ -217,10 +217,11 @@ const createDebit = async (req, res, next) => {
       return newDebit;
     });
 
-    const supplier = await Supplier.findByPk(supplierId);
-    const product = await Product.findByPk(productId);
-    sendDebitEmails(supplier, directDebit, product, req.user);
+    const supplier = await Supplier.findByPk(supplierId),
+      userInfo = await User.findByPk(req.user.id, { attributes: ["email", "secondaryEmail", "firstName"] }),
+      product = await Product.findByPk(productId);
 
+    sendDebitEmails(supplier, directDebit, product, userInfo);
     return res.status(200).json(newDirectDebit);
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;

@@ -57,8 +57,10 @@ app.use((error, req, res, next) => {
 
   try {
     await relateTables();
-    await db.sync();
     await db.authenticate();
+    console.log("authenticated to database...");
+
+    await db.sync({ alter: true });
     await createSequencesTables();
 
     console.log("connected to database...");

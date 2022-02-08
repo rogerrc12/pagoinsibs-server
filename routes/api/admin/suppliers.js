@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { check } = require("express-validator/check");
-const { sanitizeParam } = require("express-validator/filter");
+const { check, body } = require("express-validator");
 const { verify } = require("../../../middleware/auth");
 // controllers
 const suppliersController = require("../../../controllers/admin/suppliers");
@@ -24,9 +23,7 @@ router.post(
   [
     verify,
     [
-      sanitizeParam("address").customSanitizer((value) => {
-        return value.trim();
-      }),
+      body("address").trim(),
       check("name", "Ingrese un nombre correctamente.").unescape().not().isEmpty(),
       check("rif", "El rif solo debe contener números").isNumeric().isLength({ min: 4, max: 15 }),
       check("address", "Ingrese una dirección correcta").unescape().not().isEmpty(),

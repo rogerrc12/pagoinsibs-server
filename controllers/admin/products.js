@@ -1,7 +1,7 @@
 const Product = require("../../models/admin/product");
 const Supplier = require("../../models/admin/supplier");
 const Currency = require("../../models/currency");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const getProducts = async (req, res, next) => {
   try {

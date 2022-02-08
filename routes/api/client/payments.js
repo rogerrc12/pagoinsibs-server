@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
 const { verify } = require("../../../middleware/auth");
 const { imageStorage } = require("../../../helpers/multerConfig");
-const { check, body } = require("express-validator/check");
-const multer = require("multer");
+const { check, body } = require("express-validator");
 // controllers
 const paymentsController = require("../../../controllers/client/payments");
 

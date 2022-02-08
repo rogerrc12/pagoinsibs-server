@@ -1,8 +1,13 @@
-const jwt = require("jsonwebtoken");
-// const { auth } = require('google-auth-library');
-// const client = auth.fromAPIKey('');
-const publicKey = process.env.PUBLIC_JWT.replace(/\\n/gm, "\n");
-const privateKey = process.env.PRIVATE_JWT.replace(/\\n/gm, "\n");
+const jwt = require("jsonwebtoken"),
+  generateRSAKeyPair = require("generate-rsa-keypair"),
+  { auth } = require("google-auth-library"),
+  client = auth.fromAPIKey("");
+
+const keyPair = generateRSAKeyPair(),
+  publicKey = keyPair.public,
+  privateKey = keyPair.private;
+
+let algorithm = process.env.NODE_EV !== "production" ? "HS256" : "RS256";
 
 module.exports = {
   sign: (payload, options) => {
@@ -17,16 +22,15 @@ module.exports = {
       subject: options.subject,
       audience: options.audience,
       expiresIn: "1h",
-      algorithm: "RS256",
+      algorithm,
     };
 
-    return jwt.sign(payload, privateKey, signOptions);
+    return jwt.sign(payload, process.env.NODE_EV !== "production" ? "shhhhh" : privateKey, signOptions);
   },
 
   signGoogle: async (idToken) => {
-    // const res = await client.verifyIdToken({ idToken });
-    // return res.getPayload();
-    return "hello";
+    const res = await client.verifyIdToken({ idToken });
+    return res.getPayload();
   },
 
   signAdmin: (payload, options) => {
@@ -40,12 +44,11 @@ module.exports = {
       issuer: options.issuer,
       subject: options.subject,
       audience: options.audience,
-      expiresIn: "10h",
-      algorithm: "RS256",
+      expiresIn: "8h",
+      algorithm,
     };
 
-    const result = jwt.sign(payload, privateKey, signOptions);
-    return { token: result, expiresIn: 36000 };
+    return jwt.sign(payload, process.env.NODE_EV !== "production" ? "shhhhh" : privateKey, signOptions);
   },
 
   verify: (req, res, next) => {
@@ -62,12 +65,12 @@ module.exports = {
     const verifyOptions = {
       issuer: "Pago INSIBS Server",
       subject: "admin@pagos.insibs.com",
-      algorithm: ["RS256"],
+      algorithm,
     };
 
     try {
       // Decode token
-      const decoded = jwt.verify(token, publicKey, verifyOptions);
+      const decoded = jwt.verify(token, process.env.NODE_EV !== "production" ? "shhhhh" : publicKey, verifyOptions);
       req.user = decoded.user;
       next();
     } catch (error) {

@@ -1,5 +1,5 @@
 const Currency = require("../models/currency");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const { updateDebitPriceFromCurrencyPrice } = require("./admin/debits");
 

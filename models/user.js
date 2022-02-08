@@ -1,28 +1,36 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const db = require('../config/db');
+const { Sequelize, DataTypes } = require("sequelize");
+const db = require("../config/db");
 
-const User = db.define('user', {
+const User = db.define(
+  "user",
+  {
     id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true, autoIncrement: true, allowNull: false
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     firstName: {
-        type: DataTypes.STRING(50),
-        allowNull: false
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     lastName: {
-        type: DataTypes.STRING(50),
-        allowNull: false
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
     cedula: {
-        type: DataTypes.STRING(12),
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING(12),
+      allowNull: false,
+      unique: true,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    secondaryEmail: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     address: DataTypes.STRING,
     city: DataTypes.STRING(50),
@@ -30,30 +38,31 @@ const User = db.define('user', {
     birthday: DataTypes.DATE,
     gender: DataTypes.STRING(1),
     username: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING(20),
+      allowNull: false,
     },
     hash: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     clientId: {
-        type: DataTypes.STRING(12),
-        allowNull: false,
-        unique: false
+      type: DataTypes.STRING(12),
+      allowNull: false,
+      unique: true,
     },
-    lastLogin : DataTypes.DATE,
+    lastLogin: DataTypes.DATE,
     profileCompleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
     resetToken: {
-        type: DataTypes.STRING(40),
-        unique: true
+      type: DataTypes.STRING(40),
+      unique: true,
     },
-    resetTokenExp: DataTypes.DATE
-}, { timestamps: true });
+    resetTokenExp: DataTypes.DATE,
+  },
+  { timestamps: true }
+);
 
 module.exports = User;

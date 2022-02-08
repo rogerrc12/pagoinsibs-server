@@ -1,12 +1,12 @@
 const { Op } = require("sequelize");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 const AdminUser = require("../../models/admin/adminUser");
 const Role = require("../../models/admin/role");
 const bcrypt = require("bcryptjs");
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await AdminUser.findAll({ include: Role, where: { [Op.not]: { roleId: 1 } }, attributes: ["id", "firstName", "lastName", "cedula", "email", "createdAt"] });
+    const users = await AdminUser.findAll({ include: Role, where: { [Op.not]: { roleId: 1 } } });
 
     return res.status(200).json(users);
   } catch (error) {

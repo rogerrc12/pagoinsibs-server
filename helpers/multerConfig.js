@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 const aws = require("aws-sdk");
-const shortid = require("shortid");
+const { nanoid } = require("nanoid");
 const multerS3 = require("multer-s3");
 
 aws.config.update({
@@ -28,7 +28,7 @@ const imageStorage = multerS3({
   contentDisposition: "inline",
   contentType: multerS3.AUTO_CONTENT_TYPE,
   metadata: (req, file, cb) => cb(null, { fieldName: file.fieldname }),
-  key: (req, file, cb) => cb(null, shortid.generate() + "-" + file.originalname),
+  key: (req, file, cb) => cb(null, nanoid() + "-" + file.originalname),
 });
 
 const fileFilter = (req, file, cb) => {

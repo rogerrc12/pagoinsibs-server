@@ -2,7 +2,7 @@ const AdminUser = require("../../models/admin/adminUser");
 const Role = require("../../models/admin/role");
 const bcrypt = require("bcryptjs");
 const { signAdmin } = require("../../middleware/auth");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const getData = async (req, res, next) => {
   try {
@@ -48,8 +48,8 @@ const login = async (req, res, next) => {
       },
     };
 
-    const result = signAdmin(payload);
-    return res.status(200).json(result);
+    const token = { token: signAdmin(payload) };
+    return res.status(200).json(token);
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);

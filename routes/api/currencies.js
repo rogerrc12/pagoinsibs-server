@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { verify } = require("../../middleware/auth");
-const { check } = require("express-validator/check");
+const { check } = require("express-validator");
 
 // controllers
 const currencyControllers = require("../../controllers/currencies");

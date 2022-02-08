@@ -5,7 +5,7 @@ const mailgun = require("mailgun-js")({ apiKey, domain });
 module.exports = {
   send: async (options) => {
     const data = {
-      from: `Pago INSIBS <${process.env.MAILUSER}>`,
+      from: `Pago INSIBS sistema@pagoinsibs.com`,
       to: options.email,
       subject: options.subject,
       template: options.template,

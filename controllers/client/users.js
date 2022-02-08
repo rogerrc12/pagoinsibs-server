@@ -1,10 +1,10 @@
 const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
 const { v4 } = require("uuid");
-const nanoid = require("nanoid/async/generate");
+const { customAlphabet } = require("nanoid");
 const mail = require("../../mail/config");
 const { sign } = require("../../middleware/auth");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const updateProfile = async (req, res, next) => {
   const { address, city, phone, birthday, gender } = req.body;
@@ -40,14 +40,17 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-const registerUser = async (req, res, next) => {
-  const { first_name, last_name, ci_type, ci_number, email, username, password } = req.body;
+const completeUserRegistration = async (req, res, next) => {
+  const { first_name, last_name, ci_type, ci_number, email, secondaryEmail, username, password } = req.body;
+  let error;
 
   try {
-    // Validation test
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const error = new Error(errors.array()[0].msg);
+    // VALIDATIONS
+
+    // Cedula duplicated
+    const userByCedula = await User.findOne({ where: { cedula: ci_type + ci_number } });
+    if (userByCedula) {
+      error = new Error("La cédula que intentas usar ya se encuentra registrada.");
       error.statusCode = 422;
       throw error;
     }
@@ -57,7 +60,7 @@ const registerUser = async (req, res, next) => {
     const hash = await bcrypt.hash(password, salt);
 
     // generate client id
-    const client_id = await nanoid("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
+    const nanoid = customAlphabet("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10);
 
     // create user instance
     const newUser = {
@@ -65,9 +68,10 @@ const registerUser = async (req, res, next) => {
       lastName: last_name.toLowerCase(),
       cedula: ci_type + ci_number,
       email,
+      secondaryEmail,
       username: username.toLowerCase(),
       hash,
-      clientId: "IN" + client_id,
+      clientId: "IN" + nanoid(),
       roleId: 4,
     };
 
@@ -87,16 +91,44 @@ const registerUser = async (req, res, next) => {
 
     const token = { token: sign(payload) };
 
-    res.json(token);
-
     const options = {
-      email: user.email,
+      email,
       subject: "Bienvenido a pago INSIBS, registro exitoso!",
       template: "welcome_message",
-      variables: JSON.stringify({ name: user.firstName }),
+      variables: JSON.stringify({ name: first_name.toLowerCase() }),
     };
 
-    return await mail.send(options);
+    mail.send(options);
+
+    return res.json(token);
+  } catch (error) {
+    if (!error.statusCode) error.statusCode = 500;
+    next(error);
+  }
+};
+
+const startUserRegistration = async (req, res, next) => {
+  const { email } = req.body;
+  let error;
+
+  try {
+    // Express validator
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      error = new Error(errors.array()[0].msg);
+      error.statusCode = 422;
+      throw error;
+    }
+
+    // Email duplicated
+    const userByEmail = await User.findOne({ where: { email } });
+    if (userByEmail) {
+      error = new Error("El correo que intentas usar ya se encuentra registrado.");
+      error.statusCode = 422;
+      throw error;
+    }
+
+    res.send("continue registration.");
   } catch (error) {
     if (!error.statusCode) error.statusCode = 500;
     next(error);
@@ -224,7 +256,8 @@ const resetPassword = async (req, res, next) => {
 module.exports = {
   getUserData,
   updateProfile,
-  registerUser,
+  startUserRegistration,
+  completeUserRegistration,
   sendPasswordResetToken,
   getPasswordReset,
   resetPassword,

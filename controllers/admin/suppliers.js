@@ -6,7 +6,7 @@ const Status = require("../../models/status");
 const User = require("../../models/user");
 const AccPayment = require("../../models/payment");
 const CcPayment = require("../../models/payment");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const getSuppliers = async (req, res, next) => {
   try {

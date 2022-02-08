@@ -1,7 +1,7 @@
-const User = require('../../models/user');
+const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
 const { sign, signGoogle } = require("../../middleware/auth");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
@@ -15,10 +15,10 @@ const loginUser = async (req, res, next) => {
     }
 
     // Check if email exists
-    const user = await User.findOne({ where: {email} });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      const error = new Error('El email y/o la contraseña ingresados son incorrectos.');
+      const error = new Error("El email y/o la contraseña ingresados son incorrectos.");
       error.statusCode = 401;
       throw error;
     }
@@ -27,7 +27,7 @@ const loginUser = async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.hash);
 
     if (!isMatch) {
-      const error = new Error('El email y/o la contraseña ingresados son incorrectos.');
+      const error = new Error("El email y/o la contraseña ingresados son incorrectos.");
       error.statusCode = 401;
       throw error;
     }
@@ -41,8 +41,8 @@ const loginUser = async (req, res, next) => {
         name: user.firstName + " " + user.lastName,
         pay_id: user.username,
         cedula: user.cedula,
-        email: user.email
-      }
+        email: user.email,
+      },
     };
 
     const token = { token: sign(payload) };
@@ -52,7 +52,7 @@ const loginUser = async (req, res, next) => {
     if (!error.statusCode) error.statusCode = 500;
     next(error);
   }
-}
+};
 
 const googleLogin = async (req, res, next) => {
   const { tokenId } = req.body;
@@ -61,7 +61,7 @@ const googleLogin = async (req, res, next) => {
     const googleUser = await signGoogle(tokenId);
 
     // Check if email exists
-    const user = await User.findOne({ where: {email: googleUser.email} });
+    const user = await User.findOne({ where: { email: googleUser.email } });
 
     if (!user) return res.json({ registered: false, user: googleUser });
 
@@ -70,8 +70,8 @@ const googleLogin = async (req, res, next) => {
         id: user.id,
         name: user.firstName + " " + user.lastName,
         cedula: user.cedula,
-        email: user.email
-      }
+        email: user.email,
+      },
     };
 
     const token = { token: sign(payload) };
@@ -81,9 +81,9 @@ const googleLogin = async (req, res, next) => {
     error.statusCode = 500;
     next(error);
   }
-}
+};
 
 module.exports = {
   loginUser,
-  googleLogin
-}
+  googleLogin,
+};

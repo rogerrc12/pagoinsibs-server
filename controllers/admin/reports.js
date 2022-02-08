@@ -8,7 +8,7 @@ const Currency = require("../../models/currency");
 const reports = require("../../helpers/excelFiles");
 const { Op } = require("sequelize");
 const moment = require("moment");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const createReport = async (req, res, next) => {
   const { fromDate, toDate, bankId, supplierId, currencyId } = req.body;
@@ -240,16 +240,8 @@ const createReport = async (req, res, next) => {
 
         console.log(debits, payments);
 
-        // if (debits.length === 0 && payments.length === 0) {
-        //   const error = new Error("No se encontraron entradas en este rango de fecha.");
-        //   error.statusCode = 404;
-        //   throw error;
-        // }
-
-        // workbook = reports.createChargedReport(debits, payments);
-        // fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format(
-        //   "DD-MM-YYYY"
-        // )}.xlsx`;
+        workbook = reports.createChargedReport(debits, payments);
+        fileName = `Cuotas cobradas para ${bank.bankName} desde ${moment(startDate).format("DD-MM-YYYY")} hasta ${moment(endDate).format("DD-MM-YYYY")}.xlsx`;
 
         break;
       default:

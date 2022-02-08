@@ -5,7 +5,7 @@ const instapago = require("instapago");
 const moment = require("moment");
 const mail = require("../../mail/config");
 const ccGateway = instapago(process.env.NODE_ENV !== "production" ? process.env.INSTAPAGO_TEST_KEY : process.env.INSTAPAGO_KEY, process.env.INSTAPAGO_PUBLICKEY);
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 const { sendPaymentEmails } = require("../../helpers/sendMail");
 const { addDays } = require("../../helpers/functions");
 // PDF HELPERS
@@ -210,10 +210,11 @@ const createPayment = async function (req, res, next) {
       throw error;
     }
 
-    const newPayment = await Payment.create(paymentValues);
-    const supplier = await Supplier.findByPk(supplierId);
+    const supplier = await Supplier.findByPk(supplierId),
+      userInfo = await User.findByPk(req.user.id, { attributes: ["email", "secondaryEmail", "firstName"] }),
+      newPayment = await Payment.create(paymentValues);
 
-    sendPaymentEmails(supplier, paymentValues, req.user);
+    sendPaymentEmails(supplier, newPayment, userInfo);
 
     return res.status(200).json(newPayment);
   } catch (error) {

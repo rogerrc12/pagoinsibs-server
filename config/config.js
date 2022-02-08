@@ -1,26 +1,15 @@
 require("dotenv").config();
 module.exports = {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    dialect: "postgres",
-  },
-  test: {
-    username: "root",
-    password: null,
-    database: "database_test",
-    host: "127.0.0.1",
-    dialect: "mysql",
+    // username: "rogerrengifo",
+    // password: null,
+    // database: "pagoinsibs-dev",
+    // host: "127.0.0.1",
+    // dialect: "postgres",
+    use_env_variable: "TEST_DB_URL",
   },
   production: {
     use_env_variable: "DATABASE_URL",
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false,
-      },
-    },
+    operatorsAliases: false,
   },
 };
